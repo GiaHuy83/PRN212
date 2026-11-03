@@ -1,0 +1,293 @@
+<Window x:Class="ClothingShop.ProductManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Quản Lý Kho Hàng Quần Áo (Product Manager - PRN212)" 
+        Height="750" Width="1120" MinHeight="620" MinWidth="920"
+        WindowStartupLocation="CenterScreen"
+        Background="#F8FAFC" FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <!-- Metric Card Base Style -->
+        <Style x:Key="MetricCard" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16,14"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="8" ShadowDepth="1" Direction="270" Color="#64748B" Opacity="0.06"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Header -->
+        <Border Grid.Row="0" Background="#0F172A" Padding="24,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#1E293B" CornerRadius="10" Width="42" Height="42" Margin="0,0,12,0">
+                        <TextBlock Text="👗" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="V-FASHION CLOTHING STORE" FontSize="17" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Hệ Thống Quản Lý Kho &amp; Sản Phẩm Quần Áo (3-Tier CRUD)" FontSize="12" Foreground="#94A3B8"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Status pill -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="16" Padding="12,5">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="7" Height="7" Fill="#4ADE80" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="lblDbStatus" Text="CSDL: Supabase Connected" FontSize="12" FontWeight="SemiBold" Foreground="#E2E8F0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Body: TabControl -->
+        <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0" Margin="20,12,20,10">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="FontSize" Value="13.5"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="Padding" Value="18,9"/>
+                    <Setter Property="Background" Value="#E2E8F0"/>
+                    <Setter Property="Foreground" Value="#475569"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border x:Name="tabBorder" Background="{TemplateBinding Background}" CornerRadius="8,8,0,0" Padding="{TemplateBinding Padding}" Margin="0,0,4,0">
+                                    <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="tabBorder" Property="Background" Value="White"/>
+                                        <Setter Property="Foreground" Value="#2563EB"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+
+            <!-- TAB 1: DANH SÁCH QUẦN ÁO (CRUD) -->
+            <TabItem Header="👗 Quản Lý Sản Phẩm Quần Áo">
+                <Border Background="White" CornerRadius="0,10,10,10" Padding="20">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="12" ShadowDepth="1" Direction="270" Color="#64748B" Opacity="0.06"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Metric Summary Cards -->
+                        <Grid Grid.Row="0" Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Style="{StaticResource MetricCard}" BorderThickness="4,1,1,1" BorderBrush="#3B82F6">
+                                <StackPanel>
+                                    <TextBlock Text="TỔNG MÃ HÀNG" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                    <TextBlock x:Name="txtMetricTotalItems" Text="0" FontSize="24" FontWeight="Bold" Foreground="#1E293B" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="1" Style="{StaticResource MetricCard}" BorderThickness="4,1,1,1" BorderBrush="#6366F1">
+                                <StackPanel>
+                                    <TextBlock Text="TỔNG SỐ LƯỢNG TỒN" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                    <TextBlock x:Name="txtMetricTotalQty" Text="0 cái" FontSize="24" FontWeight="Bold" Foreground="#4F46E5" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="2" Style="{StaticResource MetricCard}" BorderThickness="4,1,1,1" BorderBrush="#10B981">
+                                <StackPanel>
+                                    <TextBlock Text="TỔNG GIÁ TRỊ KHO" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                    <TextBlock x:Name="txtMetricTotalValue" Text="0 VNĐ" FontSize="24" FontWeight="Bold" Foreground="#059669" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="3" Style="{StaticResource MetricCard}" BorderThickness="4,1,1,1" BorderBrush="#EF4444" Margin="0">
+                                <StackPanel>
+                                    <TextBlock Text="MÃ HẾT HÀNG" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                                    <TextBlock x:Name="txtMetricOutOfStock" Text="0 mã" FontSize="24" FontWeight="Bold" Foreground="#DC2626" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- Search & Filter Bar -->
+                        <Border Grid.Row="1" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,14">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Keyword Search -->
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="🔍" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox x:Name="txtSearchKeyword" Width="240" Height="34" VerticalContentAlignment="Center" 
+                                             Padding="10,2" BorderBrush="#CBD5E1" Background="White"
+                                             KeyDown="TxtSearchKeyword_KeyDown"/>
+                                    <Button x:Name="btnSearch" Content="Tìm Kiếm" Width="85" Height="34" Margin="8,0,0,0"
+                                            Background="#2563EB" Foreground="White" BorderThickness="0" FontWeight="SemiBold"
+                                            Cursor="Hand" Click="BtnSearch_Click"/>
+                                </StackPanel>
+
+                                <!-- Category Filter -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
+                                    <TextBlock Text="Danh Mục:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,6,0"/>
+                                    <ComboBox x:Name="cboCategoryFilter" Width="130" Height="34" VerticalContentAlignment="Center"
+                                              SelectionChanged="CboFilter_SelectionChanged">
+                                        <ComboBoxItem Content="Tất cả" IsSelected="True"/>
+                                        <ComboBoxItem Content="Áo sơ mi"/>
+                                        <ComboBoxItem Content="Áo thun"/>
+                                        <ComboBoxItem Content="Áo polo"/>
+                                        <ComboBoxItem Content="Quần jean"/>
+                                        <ComboBoxItem Content="Quần âu"/>
+                                        <ComboBoxItem Content="Váy đầm"/>
+                                        <ComboBoxItem Content="Chân váy"/>
+                                        <ComboBoxItem Content="Áo khoác"/>
+                                        <ComboBoxItem Content="Áo blazer"/>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <!-- Size Filter -->
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
+                                    <TextBlock Text="Size:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,6,0"/>
+                                    <ComboBox x:Name="cboSizeFilter" Width="90" Height="34" VerticalContentAlignment="Center"
+                                              SelectionChanged="CboFilter_SelectionChanged">
+                                        <ComboBoxItem Content="Tất cả" IsSelected="True"/>
+                                        <ComboBoxItem Content="S"/>
+                                        <ComboBoxItem Content="M"/>
+                                        <ComboBoxItem Content="L"/>
+                                        <ComboBoxItem Content="XL"/>
+                                        <ComboBoxItem Content="XXL"/>
+                                        <ComboBoxItem Content="Freesize"/>
+                                        <ComboBoxItem Content="28"/>
+                                        <ComboBoxItem Content="29"/>
+                                        <ComboBoxItem Content="30"/>
+                                        <ComboBoxItem Content="31"/>
+                                        <ComboBoxItem Content="32"/>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <!-- Action Buttons -->
+                                <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
+                                    <Button x:Name="btnRefresh" Content="🔄 Tải Lại" Width="85" Height="34" Margin="0,0,8,0"
+                                            Background="#F1F5F9" Foreground="#334155" BorderBrush="#CBD5E1" BorderThickness="1" FontWeight="SemiBold"
+                                            Cursor="Hand" Click="BtnRefresh_Click"/>
+                                    <Button x:Name="btnAdd" Content="➕ Thêm Mới" Width="100" Height="34" Margin="0,0,8,0"
+                                            Background="#059669" Foreground="White" BorderThickness="0" FontWeight="SemiBold"
+                                            Cursor="Hand" Click="BtnAdd_Click"/>
+                                    <Button x:Name="btnEdit" Content="✏️ Sửa" Width="75" Height="34" Margin="0,0,8,0"
+                                            Background="#D97706" Foreground="White" BorderThickness="0" FontWeight="SemiBold"
+                                            Cursor="Hand" Click="BtnEdit_Click"/>
+                                    <Button x:Name="btnDelete" Content="🗑️ Xóa" Width="75" Height="34"
+                                            Background="#DC2626" Foreground="White" BorderThickness="0" FontWeight="SemiBold"
+                                            Cursor="Hand" Click="BtnDelete_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Products DataGrid -->
+                        <DataGrid Grid.Row="2" x:Name="dgProducts" AutoGenerateColumns="False" 
+                                  CanUserAddRows="False" IsReadOnly="True" SelectionMode="Single"
+                                  GridLinesVisibility="Horizontal" HeadersVisibility="Column"
+                                  Background="White" RowHeight="38" FontSize="13"
+                                  AlternatingRowBackground="#F8FAFC"
+                                  BorderBrush="#E2E8F0" BorderThickness="1">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#F1F5F9"/>
+                                    <Setter Property="Foreground" Value="#334155"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="Height" Value="36"/>
+                                    <Setter Property="Padding" Value="10,0"/>
+                                    <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                                    <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Mã SKU" Binding="{Binding Sku}" Width="90" FontWeight="Bold"/>
+                                <DataGridTextColumn Header="Tên Sản Phẩm Quần Áo" Binding="{Binding Name}" Width="260"/>
+                                <DataGridTextColumn Header="Danh Mục" Binding="{Binding Category}" Width="110"/>
+                                <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="70"/>
+                                <DataGridTextColumn Header="Màu Sắc" Binding="{Binding Color}" Width="95"/>
+                                <DataGridTextColumn Header="Đơn Giá" Binding="{Binding FormattedPrice}" Width="120" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="Tồn Kho" Binding="{Binding StockQuantity}" Width="85"/>
+                                <DataGridTextColumn Header="Trạng Thái" Binding="{Binding StockStatus}" Width="120"/>
+                                <DataGridTextColumn Header="Mô Tả &amp; Chất Liệu" Binding="{Binding Description}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <!-- TAB 2: CÀI ĐẶT CSDL SUPABASE -->
+            <TabItem Header="⚙️ Cấu Hình CSDL Supabase">
+                <Border Background="White" CornerRadius="0,10,10,10" Padding="24">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="12" ShadowDepth="1" Direction="270" Color="#64748B" Opacity="0.06"/>
+                    </Border.Effect>
+                    <StackPanel MaxWidth="720" HorizontalAlignment="Left">
+                        <TextBlock Text="Cấu Hình Kết Nối Supabase PostgreSQL" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                        <TextBlock Text="Kết nối tới cơ sở dữ liệu Supabase đám mây để lưu trữ sản phẩm lâu dài" FontSize="13" Foreground="#64748B" Margin="0,4,0,18"/>
+
+                        <TextBlock Text="Supabase Connection String (URI hoặc Parameters):" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <TextBox x:Name="txtSupabaseConn" Height="36" Padding="10,4" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Margin="0,0,0,14"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                            <Button x:Name="btnTestDb" Content="⚡ Kiểm Tra Kết Nối CSDL" Width="190" Height="36" Margin="0,0,12,0"
+                                    Background="#EEF2F6" Foreground="#1E293B" BorderBrush="#CBD5E1" BorderThickness="1" FontWeight="SemiBold"
+                                    Cursor="Hand" Click="BtnTestDb_Click"/>
+                            <Button x:Name="btnSaveDb" Content="💾 Lưu Cấu Hình" Width="140" Height="36"
+                                    Background="#2563EB" Foreground="White" BorderThickness="0" FontWeight="Bold"
+                                    Cursor="Hand" Click="BtnSaveDb_Click"/>
+                        </StackPanel>
+
+                        <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="16">
+                            <StackPanel>
+                                <TextBlock Text="📌 Hướng dẫn lấy chuỗi kết nối Supabase:" FontWeight="Bold" Foreground="#334155"/>
+                                <TextBlock Text="1. Đăng nhập Supabase -> Project Settings -> Database." Margin="0,6,0,2" Foreground="#475569"/>
+                                <TextBlock Text="2. Copy Connection String (dạng URI hoặc Connection Parameters)." Margin="0,0,0,2" Foreground="#475569"/>
+                                <TextBlock Text="3. Thay [YOUR-PASSWORD] bằng mật khẩu database của bạn." Margin="0,0,0,2" Foreground="#475569"/>
+                                <TextBlock Text="4. Dán vào ô trên và nhấn 'Kiểm Tra Kết Nối CSDL' rồi 'Lưu Cấu Hình'." Foreground="#475569"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+        </TabControl>
+
+        <!-- Bottom Status Bar -->
+        <Border Grid.Row="2" Background="#E2E8F0" Padding="20,8">
+            <TextBlock x:Name="txtCrudStatus" Text="Sẵn sàng thao tác dữ liệu sản phẩm." FontSize="12" Foreground="#475569"/>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,120 @@
+<Window x:Class="ClothingShop.ProductManager.ProductEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Thông Tin Sản Phẩm Quần Áo" Height="560" Width="480"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="#F8FAFC" FontFamily="Segoe UI">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock x:Name="txtTitle" Text="Thêm Sản Phẩm Mới" FontSize="20" FontWeight="Bold" Foreground="#1E293B"/>
+            <TextBlock Text="Nhập đầy đủ thông tin chi tiết của mẫu quần áo" FontSize="13" Foreground="#64748B" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Form fields -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- SKU & Color -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Mã SKU (*)" FontWeight="SemiBold" FontSize="12" Foreground="#334155" Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtSku" Height="34" Padding="8,4" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Màu Sắc (*)" FontWeight="SemiBold" FontSize="12" Foreground="#334155" Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtColor" Height="34" Padding="8,4" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Name -->
+                <StackPanel Margin="0,0,0,12">
+                    <TextBlock Text="Tên Sản Phẩm Quần Áo (*)" FontWeight="SemiBold" FontSize="12" Foreground="#334155" Margin="0,0,0,4"/>
+                    <TextBox x:Name="txtName" Height="34" Padding="8,4" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
+                </StackPanel>
+
+                <!-- Category & Size -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Danh Mục (*)" FontWeight="SemiBold" FontSize="12" Foreground="#334155" Margin="0,0,0,4"/>
+                        <ComboBox x:Name="cboCategory" Height="34" VerticalContentAlignment="Center" Background="White" IsEditable="True">
+                            <ComboBoxItem Content="Áo sơ mi" IsSelected="True"/>
+                            <ComboBoxItem Content="Áo thun"/>
+                            <ComboBoxItem Content="Áo polo"/>
+                            <ComboBoxItem Content="Quần jean"/>
+                            <ComboBoxItem Content="Quần âu"/>
+                            <ComboBoxItem Content="Váy đầm"/>
+                            <ComboBoxItem Content="Chân váy"/>
+                            <ComboBoxItem Content="Áo khoác"/>
+                            <ComboBoxItem Content="Áo blazer"/>
+                            <ComboBoxItem Content="Phụ kiện"/>
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Kích Thước (Size) (*)" FontWeight="SemiBold" FontSize="12" Foreground="#334155" Margin="0,0,0,4"/>
+                        <ComboBox x:Name="cboSize" Height="34" VerticalContentAlignment="Center" Background="White" IsEditable="True">
+                            <ComboBoxItem Content="S"/>
+                            <ComboBoxItem Content="M" IsSelected="True"/>
+                            <ComboBoxItem Content="L"/>
+                            <ComboBoxItem Content="XL"/>
+                            <ComboBoxItem Content="XXL"/>
+                            <ComboBoxItem Content="Freesize"/>
+                            <ComboBoxItem Content="28"/>
+                            <ComboBoxItem Content="29"/>
+                            <ComboBoxItem Content="30"/>
+                            <ComboBoxItem Content="31"/>
+                            <ComboBoxItem Content="32"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Price & Stock -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Đơn Giá (VNĐ) (*)" FontWeight="SemiBold" FontSize="12" Foreground="#334155" Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtPrice" Height="34" Padding="8,4" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Số Lượng Tồn Kho (*)" FontWeight="SemiBold" FontSize="12" Foreground="#334155" Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtStock" Height="34" Padding="8,4" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Background="White"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Description -->
+                <StackPanel Margin="0,0,0,12">
+                    <TextBlock Text="Mô Tả Sản Phẩm / Chất Liệu" FontWeight="SemiBold" FontSize="12" Foreground="#334155" Margin="0,0,0,4"/>
+                    <TextBox x:Name="txtDescription" Height="80" TextWrapping="Wrap" AcceptsReturn="True" Padding="8" BorderBrush="#CBD5E1" Background="White"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button x:Name="btnCancel" Content="Hủy Bỏ" Width="100" Height="36" Margin="0,0,12,0"
+                    Background="#E2E8F0" Foreground="#475569" BorderThickness="0" FontWeight="SemiBold" Click="BtnCancel_Click"/>
+            <Button x:Name="btnSave" Content="Lưu Dữ Liệu" Width="120" Height="36"
+                    Background="#2563EB" Foreground="White" BorderThickness="0" FontWeight="SemiBold" Click="BtnSave_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
+

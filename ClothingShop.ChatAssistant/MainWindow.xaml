@@ -1,0 +1,350 @@
+<Window x:Class="ClothingShop.ChatAssistant.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ClothingShop.ChatAssistant"
+        Title="Trợ Lý AI Tư Vấn Thời Trang &amp; RAG (Chat Assistant - PRN212)" 
+        Height="780" Width="1080" MinHeight="640" MinWidth="880"
+        WindowStartupLocation="CenterScreen"
+        Background="#F8FAFC" FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- Quick Prompt Tag Button Style -->
+        <Style x:Key="PromptPill" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#334155"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Margin" Value="0,0,10,8"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="pillBorder" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="16" Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="4" ShadowDepth="1" Direction="270" Color="#94A3B8" Opacity="0.08"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="pillBorder" Property="Background" Value="#EFF6FF"/>
+                                <Setter TargetName="pillBorder" Property="BorderBrush" Value="#BFDBFE"/>
+                                <Setter Property="Foreground" Value="#1D4ED8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Header Navigation -->
+        <Border Grid.Row="0" Background="#0F172A" Padding="24,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Brand -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#1E293B" CornerRadius="10" Width="42" Height="42" Margin="0,0,12,0">
+                        <TextBlock Text="👗" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="V-FASHION AI ASSISTANT" FontSize="17" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Trợ Lý Trí Tuệ Nhân Tạo Tư Vấn Thời Trang &amp; RAG CSDL Quần Áo" FontSize="12" Foreground="#94A3B8"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Status Badges -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="16" Padding="12,5" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="7" Height="7" Fill="#38BDF8" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="lblAiProviderStatus" Text="AI: Google Gemini" FontSize="12" FontWeight="SemiBold" Foreground="#E2E8F0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="16" Padding="12,5">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="7" Height="7" Fill="#4ADE80" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="lblDbStatus" Text="CSDL: Supabase Connected" FontSize="12" FontWeight="SemiBold" Foreground="#E2E8F0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Body: Tabs -->
+        <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0" Margin="20,12,20,16"
+                    SelectionChanged="MainTabControl_SelectionChanged">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="FontSize" Value="13.5"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="Padding" Value="18,9"/>
+                    <Setter Property="Background" Value="#E2E8F0"/>
+                    <Setter Property="Foreground" Value="#475569"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border x:Name="tabBorder" Background="{TemplateBinding Background}" CornerRadius="8,8,0,0" Padding="{TemplateBinding Padding}" Margin="0,0,4,0">
+                                    <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="tabBorder" Property="Background" Value="White"/>
+                                        <Setter Property="Foreground" Value="#2563EB"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+
+            <!-- TAB 1: AI CHAT (RAG + NGOÀI) -->
+            <TabItem Header="💬 Trò Chuyện &amp; Tư Vấn AI">
+                <Border Background="White" CornerRadius="0,10,10,10" Padding="20">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="12" ShadowDepth="1" Direction="270" Color="#64748B" Opacity="0.06"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Mode Switch Bar: RAG vs Chat Ra Ngoài -->
+                        <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10" Padding="16,10" Margin="0,0,0,14">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Chế Độ Phân Tích:" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                                    <RadioButton x:Name="rbRagMode" Content="🧠 Chat với AI (RAG - Tra Cứu Kho Quần Áo &amp; Bảng Size)" 
+                                                 IsChecked="True" FontWeight="SemiBold" Foreground="#2563EB" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                                    <RadioButton x:Name="rbGeneralMode" Content="🌐 Chat Ra Ngoài (General Fashion LLM Chat)" 
+                                                 FontWeight="SemiBold" Foreground="#475569" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <Button Grid.Column="2" x:Name="btnClearChat" Content="🗑️ Làm Mới Đoạn Chat" Width="145" Height="32"
+                                        Background="#F1F5F9" Foreground="#475569" BorderBrush="#CBD5E1" BorderThickness="1" FontSize="12" FontWeight="SemiBold"
+                                        Cursor="Hand" Click="BtnClearChat_Click"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Quick Prompt Suggestion Pills -->
+                        <WrapPanel Grid.Row="1" Margin="0,0,0,10">
+                            <TextBlock Text="Gợi ý câu hỏi:" VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,10,8"/>
+                            <Button Style="{StaticResource PromptPill}" Content="📏 Bảng size áo nam 1m70 65kg" Click="PromptPill_Click"/>
+                            <Button Style="{StaticResource PromptPill}" Content="👔 Có mẫu sơ mi trắng công sở không?" Click="PromptPill_Click"/>
+                            <Button Style="{StaticResource PromptPill}" Content="🔄 Chính sách đổi trả hàng trong mấy ngày?" Click="PromptPill_Click"/>
+                            <Button Style="{StaticResource PromptPill}" Content="🌟 Xu hướng phối đồ tối giản năm nay?" Click="PromptPill_Click"/>
+                        </WrapPanel>
+
+                        <!-- Chat Messages Display Area -->
+                        <Border Grid.Row="2" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10" Margin="0,0,0,14">
+                            <ScrollViewer x:Name="chatScrollViewer" Padding="16,14" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="icChatMessages">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,6,0,16">
+                                                <!-- USER MESSAGE (Aligned Right) -->
+                                                <Grid HorizontalAlignment="Right" MaxWidth="720" Visibility="{Binding IsUser, Converter={StaticResource BoolToVis}}">
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                        <Border Background="#2563EB" CornerRadius="16,16,4,16" Padding="16,12" MaxWidth="660">
+                                                            <Border.Effect>
+                                                                <DropShadowEffect BlurRadius="6" ShadowDepth="1" Direction="270" Color="#1E40AF" Opacity="0.2"/>
+                                                            </Border.Effect>
+                                                            <StackPanel>
+                                                                <TextBlock Text="{Binding Content}" Foreground="White" FontSize="14" TextWrapping="Wrap" LineHeight="20"/>
+                                                                <TextBlock Text="{Binding FormattedTime}" Foreground="#BFDBFE" FontSize="11" HorizontalAlignment="Right" Margin="0,4,0,0"/>
+                                                            </StackPanel>
+                                                        </Border>
+                                                        <!-- User Avatar -->
+                                                        <Border Background="#DBEAFE" Width="34" Height="34" CornerRadius="17" Margin="8,0,0,0" VerticalAlignment="Top">
+                                                            <TextBlock Text="👤" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <!-- ASSISTANT AI MESSAGE (Aligned Left) -->
+                                                <Grid HorizontalAlignment="Left" MaxWidth="820" Visibility="{Binding IsAssistant, Converter={StaticResource BoolToVis}}">
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                                        <!-- AI Avatar -->
+                                                        <Border Background="#EEF2FF" BorderBrush="#C7D2FE" BorderThickness="1" Width="36" Height="36" CornerRadius="18" Margin="0,0,10,0" VerticalAlignment="Top">
+                                                            <TextBlock Text="🤖" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+
+                                                        <StackPanel MaxWidth="760">
+                                                            <!-- Header metadata pill badges -->
+                                                            <StackPanel Orientation="Horizontal" Margin="2,0,0,6">
+                                                                <!-- Route Pill Badge -->
+                                                                <Border Background="#EEF2FF" BorderBrush="#C7D2FE" BorderThickness="1" CornerRadius="12" Padding="8,3" Margin="0,0,8,0">
+                                                                    <TextBlock Text="{Binding RouteBadgeText}" FontSize="11.5" FontWeight="Bold" Foreground="#3730A3"/>
+                                                                </Border>
+                                                                <!-- Latency Pill Badge -->
+                                                                <Border Background="#F1F5F9" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12" Padding="8,3" Margin="0,0,8,0">
+                                                                    <TextBlock Text="{Binding LatencyMs, StringFormat='⏱️ {0}ms'}" FontSize="11" FontWeight="SemiBold" Foreground="#64748B"/>
+                                                                </Border>
+                                                                <!-- Timestamp -->
+                                                                <TextBlock Text="{Binding FormattedTime}" FontSize="11" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                                            </StackPanel>
+
+                                                            <!-- Bubble Content with Markdown Formatter -->
+                                                            <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="4,16,16,16" Padding="18,14">
+                                                                <Border.Effect>
+                                                                    <DropShadowEffect BlurRadius="8" ShadowDepth="1" Direction="270" Color="#64748B" Opacity="0.08"/>
+                                                                </Border.Effect>
+                                                                <!-- Formatted Markdown Content -->
+                                                                <TextBlock local:MarkdownHelper.Markdown="{Binding Content}"
+                                                                           FontSize="14" TextWrapping="Wrap" LineHeight="22"/>
+                                                            </Border>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+
+                        <!-- Input Box & Send Button -->
+                        <Border Grid.Row="3" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="24" Padding="6,4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox x:Name="txtChatInput" Height="40" Padding="14,8" FontSize="14" VerticalContentAlignment="Center"
+                                         BorderThickness="0" Background="Transparent"
+                                         KeyDown="TxtChatInput_KeyDown"/>
+
+                                <Button Grid.Column="1" x:Name="btnSend" Content="Gửi Tin Nhắn 🚀" Width="140" Height="40" Margin="4,0,0,0"
+                                        Background="#2563EB" Foreground="White" BorderThickness="0" FontWeight="Bold" FontSize="13"
+                                        Cursor="Hand" Click="BtnSend_Click">
+                                    <Button.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="20"/>
+                                        </Style>
+                                    </Button.Resources>
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <!-- TAB 2: CẤU HÌNH API KEY AI & CSDL -->
+            <TabItem Header="⚙️ Cấu Hình API Key AI &amp; CSDL">
+                <Border Background="White" CornerRadius="0,10,10,10" Padding="24">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="12" ShadowDepth="1" Direction="270" Color="#64748B" Opacity="0.06"/>
+                    </Border.Effect>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel MaxWidth="760" HorizontalAlignment="Left">
+                            <TextBlock Text="Cấu Hình Hoán Chuyển Nền Tảng AI (Gọi API Thật 100%)" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                            <TextBlock Text="Chọn nền tảng AI và dán API Key tương ứng để ứng dụng gọi trực tiếp qua REST API." 
+                                       FontSize="13" Foreground="#64748B" Margin="0,4,0,18"/>
+
+                            <!-- SECTION 1: AI PROVIDER -->
+                            <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10" Padding="18" Margin="0,0,0,18">
+                                <StackPanel>
+                                    <TextBlock Text="1. CHỌN NHÀ CUNG CẤP AI &amp; NHẬP API KEY" FontSize="14" FontWeight="Bold" Foreground="#2563EB" Margin="0,0,0,12"/>
+
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="180"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Nền Tảng AI:" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <ComboBox Grid.Column="1" x:Name="cboProvider" Height="36" VerticalContentAlignment="Center"
+                                                  SelectionChanged="CboProvider_SelectionChanged">
+                                            <ComboBoxItem Content="Google Gemini (Gemini 1.5 Flash / 2.0)" IsSelected="True"/>
+                                            <ComboBoxItem Content="OpenAI (ChatGPT gpt-4o / gpt-4o-mini)"/>
+                                            <ComboBoxItem Content="Anthropic Claude (Claude 3.5 Sonnet / Haiku)"/>
+                                        </ComboBox>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="180"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="API Key (* Bắt buộc):" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Column="1" x:Name="txtApiKey" Height="36" Padding="10,4" VerticalContentAlignment="Center" BorderBrush="#CBD5E1"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="180"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Model Name:" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Column="1" x:Name="txtModelName" Height="36" Padding="10,4" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Text="gemini-1.5-flash"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="180"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Base URL (Tùy chọn):" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Column="1" x:Name="txtBaseUrl" Height="36" Padding="10,4" VerticalContentAlignment="Center" BorderBrush="#CBD5E1"/>
+                                    </Grid>
+
+                                    <Button x:Name="btnTestAi" Content="🧪 Kiểm Tra Kết Nối API AI Ngay" Width="230" Height="36" HorizontalAlignment="Left"
+                                            Background="#EEF2F6" Foreground="#1E293B" BorderBrush="#CBD5E1" BorderThickness="1" FontWeight="SemiBold"
+                                            Cursor="Hand" Click="BtnTestAi_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- SECTION 2: SUPABASE POSTGRESQL -->
+                            <Border BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10" Padding="18" Margin="0,0,0,18">
+                                <StackPanel>
+                                    <TextBlock Text="2. CƠ SỞ DỮ LIỆU SUPABASE POSTGRESQL (RAG KNOWLEDGE BASE)" FontSize="14" FontWeight="Bold" Foreground="#059669" Margin="0,0,0,12"/>
+
+                                    <TextBlock Text="Supabase Connection String (URI hoặc Parameters):" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                    <TextBox x:Name="txtSupabaseConn" Height="36" Padding="10,4" VerticalContentAlignment="Center" BorderBrush="#CBD5E1" Margin="0,0,0,12"/>
+
+                                    <Button x:Name="btnTestDb" Content="⚡ Kiểm Tra Kết Nối Supabase" Width="210" Height="36" HorizontalAlignment="Left"
+                                            Background="#EEF2F6" Foreground="#1E293B" BorderBrush="#CBD5E1" BorderThickness="1" FontWeight="SemiBold"
+                                            Cursor="Hand" Click="BtnTestDb_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- SAVE BUTTON -->
+                            <Button x:Name="btnSaveConfig" Content="💾 Lưu Cấu Hình Hệ Thống" Height="42" Width="230" HorizontalAlignment="Left"
+                                    Background="#2563EB" Foreground="White" BorderThickness="0" FontWeight="Bold" FontSize="14"
+                                    Cursor="Hand" Click="BtnSaveConfig_Click"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
