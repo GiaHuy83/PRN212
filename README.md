@@ -1,4 +1,4 @@
-# 👗 V-Fashion Clothing Store & AI RAG Assistant (PRN212)
+# V-Fashion Clothing Store & AI RAG Assistant (PRN212)
 
 [![.NET 9.0](https://img.shields.io/badge/.NET-9.0%20(WPF)-512BD4?style=flat&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![Architecture](https://img.shields.io/badge/Architecture-3--Tier%20(DAL--BLL--UI)-orange?style=flat)](https://learn.microsoft.com/en-us/dotnet/architecture/)
@@ -9,12 +9,13 @@
 
 ---
 
-## 📑 Mục Lục
+## Mục Lục
 1. [Giới Thiệu Dự Án](#1-giới-thiệu-dự-án)
 2. [Điểm Nổi Bật Về Kỹ Thuật & AI](#2-điểm-nổi-bật-về-kỹ-thuật--ai)
 3. [Kiến Trúc Hệ Thống (3-Tier)](#3-kiến-trúc-hệ-thống-3-tier)
 4. [Hướng Dẫn Thiết Lập CSDL Supabase (1 Phút)](#4-hướng-dẫn-thiết-lập-csdl-supabase-1-phút)
-5. [Hướng Dẫn Cài Đặt & Chạy 2 App WPF](#5-hướng-dẫn-cài-đặt--chạy-2-app-wpf)
+5. [Hướng Dẫn Cấu Hình `appsettings.json` & AI API Key](#5-hướng-dẫn-cấu-hình-appsettingsjson--ai-api-key)
+6. [Hướng Dẫn Cài Đặt & Chạy 2 App WPF](#6-hướng-dẫn-cài-đặt--chạy-2-app-wpf)
 
 ---
 
@@ -39,12 +40,12 @@ Dự án bao gồm 2 ứng dụng WPF độc lập phục vụ nhu cầu vận h
 
 ## 2. Điểm Nổi Bật Về Kỹ Thuật & AI
 
-* 🤖 **Gọi API Thật 100% (No Mock AI):** Tích hợp trực tiếp 3 bộ REST Client chính thức gọi trực tiếp tới Google Gemini (`generativelanguage.googleapis.com`), Anthropic Claude (`api.anthropic.com/v1/messages`), và OpenAI (`api.openai.com/v1/chat/completions`). Đo độ trễ mạng thực tế (Latency ms).
-* 🛡️ **Router & Guardrails Bằng C# Thuần (Không Phụ Thuộc Python Laya):** Toàn bộ cơ chế bảo mật (chặn Prompt Injection, SQL Injection `DROP TABLE`, `SELECT * FROM`) và lọc câu hỏi ngoài phạm vi (thời tiết, ẩm thực, quy đổi kg/gam) được code bằng C# trong BLL, xử lý tức thì (< 1ms).
-* 🧠 **RAG Pipeline Thông Minh:** Kết hợp tìm kiếm toàn văn PostgreSQL qua hàm RPC `search_knowledge_documents_text` và đối chiếu kho hàng `ProductDAO` để đưa vào prompt ngữ cảnh chống hallucination (bịa đặt thông tin).
-* ❓ **Xử Lý Thiếu Dữ Liệu Lịch Sự:** Khi khách hỏi những thông tin ngoài phạm vi hoặc CSDL không có dữ liệu, AI trả lời thẳng thắn: *"Xin lỗi bạn, hiện tại trong hệ thống chưa có thông tin về câu hỏi này."*
-* 🎨 **Định Dạng Markdown WPF:** Tự động chuyển đổi cú pháp Markdown (`**in đậm**`, `* gạch đầu dòng`) thành các thẻ Inlines đẹp mắt, không bị lộ dấu hoa thị thô.
-* 💾 **Tự Động Lưu Cấu Hình Đa Đường Dẫn (Auto-Save):** Đồng bộ cấu hình API Key và chuỗi kết nối vào cả thư mục runtime lẫn file gốc của project, tự động ghi nhớ ngay khi gõ hoặc chuyển tab.
+* **Gọi API Thật 100% (No Mock AI):** Tích hợp trực tiếp 3 bộ REST Client chính thức gọi trực tiếp tới Google Gemini (`generativelanguage.googleapis.com`), Anthropic Claude (`api.anthropic.com/v1/messages`), và OpenAI (`api.openai.com/v1/chat/completions`). Đo độ trễ mạng thực tế (Latency ms).
+* **Router & Guardrails Bằng C# Thuần:** Toàn bộ cơ chế bảo mật (chặn Prompt Injection, SQL Injection `DROP TABLE`, `SELECT * FROM`) và lọc câu hỏi ngoài phạm vi (thời tiết, ẩm thực, quy đổi kg/gam) được code bằng C# trong BLL, xử lý tức thì (< 1ms).
+* **RAG Pipeline Thông Minh:** Kết hợp tìm kiếm toàn văn PostgreSQL qua hàm RPC `search_knowledge_documents_text` và đối chiếu kho hàng `ProductDAO` để đưa vào prompt ngữ cảnh chống hallucination (bịa đặt thông tin).
+* **Xử Lý Thiếu Dữ Liệu Lịch Sự:** Khi khách hỏi những thông tin ngoài phạm vi hoặc CSDL không có dữ liệu, AI trả lời thẳng thắn: *"Xin lỗi bạn, hiện tại trong hệ thống chưa có thông tin về câu hỏi này."*
+* **Định Dạng Markdown WPF:** Tự động chuyển đổi cú pháp Markdown (`**in đậm**`, `* gạch đầu dòng`) thành các thẻ Inlines đẹp mắt, không bị lộ dấu hoa thị thô.
+* **Tự Động Lưu Cấu Hình Đa Đường Dẫn (Auto-Save):** Đồng bộ cấu hình API Key và chuỗi kết nối vào cả thư mục runtime lẫn file gốc của project, tự động ghi nhớ ngay khi gõ hoặc chuyển tab.
 
 ---
 
@@ -104,7 +105,38 @@ PRN212/
 
 ---
 
-## 5. Hướng Dẫn Cài Đặt & Chạy 2 App WPF
+## 5. Hướng Dẫn Cấu Hình `appsettings.json` & AI API Key
+
+File `appsettings.json` đã được đưa vào `.gitignore` để tránh lộ API Key và thông tin kết nối CSDL khi đẩy code lên Git. Bạn có thể cấu hình theo một trong hai cách sau:
+
+### Cách 1: Cấu hình trực tiếp trên giao diện App (Khuyên dùng)
+1. Chạy ứng dụng (`ClothingShop.ProductManager` hoặc `ClothingShop.ChatAssistant`).
+2. Chuyển sang tab **Cấu Hình**:
+   - **Với `ProductManager`:** Dán **Supabase Connection String** lấy ở Mục 4 -> nhấn **Kiểm Tra Kết Nối CSDL** -> nhấn **Lưu Cấu Hình**.
+   - **Với `ChatAssistant`:** Chọn nhà cung cấp AI, dán **API Key**, điền **Model Name**, dán **Supabase Connection String** -> nhấn **Kiểm Tra Kết Nối** -> nhấn **Lưu Cấu Hình Hệ Thống**.
+3. Ứng dụng sẽ tự động tạo và đồng bộ file `appsettings.json` cho các lần chạy sau. *(Nếu chưa nhập Supabase Connection String, app vẫn chạy ở chế độ Local Cache với dữ liệu mẫu tích hợp sẵn).*
+
+### Cách 2: Tạo file `appsettings.json` thủ công trước khi chạy
+1. Sao chép file mẫu `appsettings.example.json` thành `appsettings.json` trong thư mục `ClothingShop.ProductManager/` và `ClothingShop.ChatAssistant/`.
+2. Điền `ApiKey` và `SupabaseConnectionString` của bạn vào file:
+   ```json
+   {
+     "Provider": "Gemini",
+     "ApiKey": "YOUR_AI_API_KEY",
+     "ModelName": "gemini-2.5-flash-lite",
+     "BaseUrl": "",
+     "SupabaseConnectionString": "Host=db.[YOUR-PROJECT-REF].supabase.co;Port=5432;Database=postgres;Username=postgres;Password=[YOUR-PASSWORD];SSL Mode=Require;Trust Server Certificate=true;"
+   }
+   ```
+
+### Danh sách AI Provider & Model hỗ trợ
+- **Google Gemini (Khuyên dùng - có gói miễn phí):** Lấy API Key tại [Google AI Studio](https://aistudio.google.com). Model gợi ý: `gemini-2.5-flash-lite` hoặc `gemini-1.5-flash`.
+- **OpenAI:** Sử dụng API Key `sk-...`. Model gợi ý: `gpt-4o-mini`.
+- **Anthropic Claude:** Sử dụng API Key `sk-ant-...`. Model gợi ý: `claude-3-5-sonnet-20241022`.
+
+---
+
+## 6. Hướng Dẫn Cài Đặt & Chạy 2 App WPF
 
 ### Yêu Cầu Hệ Thống:
 - Hệ điều hành: Windows 10/11.
