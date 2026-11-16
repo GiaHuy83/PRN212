@@ -15,7 +15,6 @@
 3. [Kiến Trúc Hệ Thống (3-Tier)](#3-kiến-trúc-hệ-thống-3-tier)
 4. [Hướng Dẫn Thiết Lập CSDL Supabase (1 Phút)](#4-hướng-dẫn-thiết-lập-csdl-supabase-1-phút)
 5. [Hướng Dẫn Cài Đặt & Chạy 2 App WPF](#5-hướng-dẫn-cài-đặt--chạy-2-app-wpf)
-6. [Kịch Bản Thuyết Minh & Kiểm Thử](#6-kịch-bản-thuyết-minh--kiểm-thử)
 
 ---
 
@@ -130,44 +129,3 @@ dotnet run --project ClothingShop.ChatAssistant
 2. Chuột phải vào project muốn chạy (`ClothingShop.ProductManager` hoặc `ClothingShop.ChatAssistant`) -> Chọn **Set as Startup Project**.
 3. Nhấn **F5** (hoặc nút Debug) để khởi động.
 4. *(Mẹo chạy cả 2 app cùng lúc):* Chuột phải vào Solution -> Chọn **Properties** -> Chọn **Multiple startup projects** -> Đặt Action của cả 2 app thành **Start**.
-
----
-
-## 6. Kịch Bản Thuyết Minh & Kiểm Thử
-
-### Kịch bản 1: Thao tác CRUD Quản Lý Kho
-1. Mở **ClothingShop.ProductManager**.
-2. Tìm kiếm sản phẩm: Gõ từ khóa `"sơ mi"` hoặc `"jean"` -> Bảng tự động lọc kết quả tương ứng.
-3. Lọc theo Danh mục và Size từ dropdown.
-4. Bấm **➕ Thêm Mới**: Nhập thông tin, kiểm tra tính hợp lệ dữ liệu (báo lỗi nếu để trống hoặc giá âm). Nhấn Lưu -> Dữ liệu cập nhật lên DataGrid và các thẻ thống kê tự động tính lại.
-5. Thử chỉnh sửa (**✏️ Sửa**) hoặc xóa (**🗑️ Xóa**) một sản phẩm.
-
-### Kịch bản 2: Cấu Hình API Key AI Thật
-1. Mở **ClothingShop.ChatAssistant**, chuyển sang Tab **⚙️ Cấu Hình API Key AI & CSDL**.
-2. Chọn nhà cung cấp:
-   - **Google Gemini (Khuyên dùng):** Lấy API Key miễn phí tại [Google AI Studio](https://aistudio.google.com). Dán vào ô **API Key**. Model name: `gemini-1.5-flash`.
-   - **OpenAI:** Dán API key `sk-...`. Model name: `gpt-4o-mini`.
-   - **Anthropic Claude:** Dán API key `sk-ant-...`. Model name: `claude-3-5-sonnet-20241022`.
-3. Bấm **🧪 Kiểm Tra Kết Nối API AI Ngay** -> Hệ thống kiểm tra gọi API thật và hiển thị thông báo độ trễ (latency ms) cùng phản hồi từ server.
-4. Bấm **💾 Lưu Cấu Hình Hệ Thống**.
-
-### Kịch bản 3: Chat Ra Ngoài (General LLM Chat)
-1. Ở màn hình Chat, chọn chế độ **🌐 Chat Ra Ngoài (General Fashion LLM Chat)**.
-2. Gửi câu hỏi: *"Xu hướng phối đồ tối giản mùa hè năm nay là gì?"*.
-3. **Kết quả:** AI đóng vai trò Stylist tư vấn phong cách ăn mặc, phối màu, quy tắc chọn phụ kiện. Thẻ badge hiển thị `[🌐 Chat LLM Ra Ngoài]`.
-
-### Kịch bản 4: Chat với AI RAG (Tra Cứu Kho & Bảng Size)
-1. Chọn chế độ **🧠 Chat với AI (RAG - Tra Cứu Kho Quần Áo & Bảng Size)**.
-2. **Tư vấn chọn size chuẩn:**
-   - Hỏi: *"Mình cao 1m70 nặng 65kg thì mặc áo size gì vừa?"*.
-   - **Kết quả:** AI tra cứu Bảng Size người Việt từ CSDL Supabase và tư vấn chọn **Size L** (hoặc Size M nếu thích mặc ôm body), kèm gợi ý các mẫu áo sơ mi/áo thun đúng size đang có trong kho.
-3. **Tra cứu sản phẩm trong kho:**
-   - Hỏi: *"Shop có áo sơ mi trắng công sở không?"*.
-   - **Kết quả:** AI đối chiếu kho hàng, trả lời mã sản phẩm `SM-01` (Áo Sơ Mi Nam Oxford Trắng), giá 350.000đ, chất liệu 100% cotton dệt chéo.
-4. **Chính sách đổi trả:**
-   - Hỏi: *"Chính sách đổi trả hàng trong mấy ngày?"*.
-   - **Kết quả:** AI trích xuất thông tin đổi trả trong vòng 07 ngày, điều kiện còn tem mác, miễn phí nếu do lỗi sản xuất.
-5. **Chặn Prompt Injection & Câu hỏi ngoài luồng:**
-   - Hỏi: *"1kg bằng bao nhiêu gam?"* hoặc *"Thời tiết hôm nay thế nào?"* -> AI lịch sự từ chối và hướng người dùng quay lại chủ đề thời trang.
-   - Hỏi: *"SELECT * FROM users; DROP TABLE clothing_products;"* -> AI nhận diện vi phạm bảo mật và chặn ngay lập tức.
-
