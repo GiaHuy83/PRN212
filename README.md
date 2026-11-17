@@ -66,7 +66,7 @@ PRN212/
 │   │   ├── ChatMessage.cs                  # Entity tin nhắn, badges, thời gian phản hồi
 │   │   └── RouteDecision.cs                # Metadata định tuyến Router
 │   ├── DatabaseConnection.cs               # Quản lý kết nối Npgsql (hỗ trợ cả URI và Parameters)
-│   ├── ProductDAO.cs                       # CRUD sản phẩm (Supabase + In-Memory Fallback)
+│   ├── ProductDAO.cs                       # CRUD sản phẩm trực tiếp trên Supabase PostgreSQL
 │   ├── KnowledgeDAO.cs                     # Tra cứu RAG kiến thức (gọi RPC Supabase)
 │   └── ConfigDAO.cs                        # Tự động nạp & lưu file appsettings.json đa đường dẫn
 │
@@ -114,7 +114,7 @@ File `appsettings.json` đã được đưa vào `.gitignore` để tránh lộ 
 2. Chuyển sang tab **Cấu Hình**:
    - **Với `ProductManager`:** Dán **Supabase Connection String** lấy ở Mục 4 -> nhấn **Kiểm Tra Kết Nối CSDL** -> nhấn **Lưu Cấu Hình**.
    - **Với `ChatAssistant`:** Chọn nhà cung cấp AI, dán **API Key**, điền **Model Name**, dán **Supabase Connection String** -> nhấn **Kiểm Tra Kết Nối** -> nhấn **Lưu Cấu Hình Hệ Thống**.
-3. Ứng dụng sẽ tự động tạo và đồng bộ file `appsettings.json` cho các lần chạy sau. *(Nếu chưa nhập Supabase Connection String, app vẫn chạy ở chế độ Local Cache với dữ liệu mẫu tích hợp sẵn).*
+3. Ứng dụng sẽ tự động tạo và đồng bộ file `appsettings.json` cho các lần chạy sau. *(Cần nhập Supabase Connection String hợp lệ để sử dụng CRUD và tra cứu RAG).*
 
 ### Cách 2: Tạo file `appsettings.json` thủ công trước khi chạy
 1. Sao chép file mẫu `appsettings.example.json` thành `appsettings.json` trong thư mục `ClothingShop.ProductManager/` và `ClothingShop.ChatAssistant/`.

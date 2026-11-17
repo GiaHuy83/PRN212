@@ -13,8 +13,8 @@ namespace ClothingShop.BLL
 {
     public class AiChatService
     {
-        private readonly ProductDAO _productDao;
-        private readonly KnowledgeDAO _knowledgeDao;
+        private ProductDAO _productDao;
+        private KnowledgeDAO _knowledgeDao;
         private AppConfig _config;
 
         public AiChatService(string connectionString, AppConfig config)
@@ -27,6 +27,8 @@ namespace ClothingShop.BLL
         public void UpdateConfig(AppConfig config)
         {
             _config = config;
+            _productDao = new ProductDAO(config.SupabaseConnectionString);
+            _knowledgeDao = new KnowledgeDAO(config.SupabaseConnectionString);
         }
 
         public async Task<ChatMessage> SendMessageAsync(string userInput, bool isRagMode, CancellationToken ct = default)
@@ -123,8 +125,25 @@ QUY TẮC TRẢ LỜI:
             }
 
             // BƯỚC 2: TRUY XUẤT DỮ LIỆU SẢN PHẨM & TÀI LIỆU KIẾN THỨC (RETRIEVAL PHASE)
-            var matchedProducts = await RetrieveMatchingProductsAsync(input, ct);
-            var knowledgeContext = await _knowledgeDao.SearchKnowledgeAsync(input, 3, ct);
+            List<ClothingProduct> matchedProducts;
+            string? knowledgeContext;
+            try
+            {
+                matchedProducts = await RetrieveMatchingProductsAsync(input, ct);
+                knowledgeContext = await _knowledgeDao.SearchKnowledgeAsync(input, 3, ct);
+            }
+            catch (Exception ex)
+            {
+                sw.Stop();
+                return new ChatMessage
+                {
+                    Role = "assistant",
+                    Content = $"⚠️ Không thể truy xuất dữ liệu RAG từ Supabase:\n{ex.Message}\n\nVui lòng kiểm tra lại Connection String trong Tab 'Cấu Hình API Key AI & CSDL'.",
+                    IsRag = true,
+                    Route = decision.Route,
+                    LatencyMs = (int)sw.ElapsedMilliseconds
+                };
+            }
 
             // BƯỚC 3: KIỂM TRA ĐỦ DỮ LIỆU CSDL
             // Nếu hỏi về sản phẩm, size, chính sách nhưng trong kho và tài liệu không có dữ liệu -> Báo không có thông tin

@@ -202,11 +202,9 @@ namespace ClothingShop.ChatAssistant
         private void UpdateStatusBadges()
         {
             lblAiProviderStatus.Text = $"AI: {_config.Provider}";
-            lblDbStatus.Text = !string.IsNullOrWhiteSpace(_config.SupabaseConnectionString)
-                               && !_config.SupabaseConnectionString.Contains("[YOUR-PASSWORD]")
-                               && !_config.SupabaseConnectionString.Contains("[YOUR-PROJECT-REF]")
+            lblDbStatus.Text = DatabaseConnection.IsConfigured(_config.SupabaseConnectionString)
                 ? "CSDL: Supabase Connected" 
-                : "CSDL: Local Cache";
+                : "CSDL: Chưa cấu hình";
         }
 
         private async void BtnTestAi_Click(object sender, RoutedEventArgs e)

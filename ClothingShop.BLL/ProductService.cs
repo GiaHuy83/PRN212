@@ -35,15 +35,22 @@ namespace ClothingShop.BLL
                 return (false, errorMsg, null);
             }
 
-            // Kiểm tra trùng mã SKU
-            var existing = await _productDao.GetAllAsync(ct);
-            if (existing.Any(p => p.Sku.Equals(product.Sku.Trim(), StringComparison.OrdinalIgnoreCase)))
+            try
             {
-                return (false, $"Mã SKU '{product.Sku.Trim().ToUpper()}' đã tồn tại trong hệ thống.", null);
-            }
+                // Kiểm tra trùng mã SKU
+                var existing = await _productDao.GetAllAsync(ct);
+                if (existing.Any(p => p.Sku.Equals(product.Sku.Trim(), StringComparison.OrdinalIgnoreCase)))
+                {
+                    return (false, $"Mã SKU '{product.Sku.Trim().ToUpper()}' đã tồn tại trong hệ thống.", null);
+                }
 
-            var created = await _productDao.AddAsync(product, ct);
-            return (true, "Thêm sản phẩm thành công!", created);
+                var created = await _productDao.AddAsync(product, ct);
+                return (true, "Thêm sản phẩm thành công!", created);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi thao tác Supabase: {ex.Message}", null);
+            }
         }
 
         public async Task<(bool success, string message)> UpdateProductAsync(ClothingProduct product, CancellationToken ct = default)
@@ -54,21 +61,35 @@ namespace ClothingShop.BLL
                 return (false, errorMsg);
             }
 
-            // Kiểm tra trùng mã SKU với sản phẩm khác
-            var existing = await _productDao.GetAllAsync(ct);
-            if (existing.Any(p => p.Id != product.Id && p.Sku.Equals(product.Sku.Trim(), StringComparison.OrdinalIgnoreCase)))
+            try
             {
-                return (false, $"Mã SKU '{product.Sku.Trim().ToUpper()}' đã thuộc về một sản phẩm khác.");
-            }
+                // Kiểm tra trùng mã SKU với sản phẩm khác
+                var existing = await _productDao.GetAllAsync(ct);
+                if (existing.Any(p => p.Id != product.Id && p.Sku.Equals(product.Sku.Trim(), StringComparison.OrdinalIgnoreCase)))
+                {
+                    return (false, $"Mã SKU '{product.Sku.Trim().ToUpper()}' đã thuộc về một sản phẩm khác.");
+                }
 
-            var ok = await _productDao.UpdateAsync(product, ct);
-            return ok ? (true, "Cập nhật sản phẩm thành công!") : (false, "Không tìm thấy sản phẩm để cập nhật.");
+                var ok = await _productDao.UpdateAsync(product, ct);
+                return ok ? (true, "Cập nhật sản phẩm thành công!") : (false, "Không tìm thấy sản phẩm để cập nhật.");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi thao tác Supabase: {ex.Message}");
+            }
         }
 
         public async Task<(bool success, string message)> DeleteProductAsync(long id, CancellationToken ct = default)
         {
-            var ok = await _productDao.DeleteAsync(id, ct);
-            return ok ? (true, "Xóa sản phẩm thành công!") : (false, "Không tìm thấy sản phẩm để xóa.");
+            try
+            {
+                var ok = await _productDao.DeleteAsync(id, ct);
+                return ok ? (true, "Xóa sản phẩm thành công!") : (false, "Không tìm thấy sản phẩm để xóa.");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi thao tác Supabase: {ex.Message}");
+            }
         }
 
         public async Task<List<ClothingProduct>> SearchProductsAsync(string? keyword, string? category = null, string? size = null, CancellationToken ct = default)

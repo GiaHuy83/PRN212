@@ -31,20 +31,36 @@ namespace ClothingShop.ProductManager
             };
         }
 
-        private void UpdateDbStatus()
+        private void UpdateDbStatus(bool? connectionSucceeded = null)
         {
-            lblDbStatus.Text = !string.IsNullOrWhiteSpace(_config.SupabaseConnectionString)
-                               && !_config.SupabaseConnectionString.Contains("[YOUR-PASSWORD]")
-                               && !_config.SupabaseConnectionString.Contains("[YOUR-PROJECT-REF]")
-                ? "⚡ CSDL: Supabase Connected"
-                : "⚡ CSDL: Local Cache (Sẵn sàng)";
+            if (!DatabaseConnection.IsConfigured(_config.SupabaseConnectionString))
+            {
+                lblDbStatus.Text = "⚡ CSDL: Chưa cấu hình Supabase";
+                return;
+            }
+
+            lblDbStatus.Text = connectionSucceeded == false
+                ? "⚡ CSDL: Lỗi kết nối Supabase"
+                : "⚡ CSDL: Supabase Connected";
         }
 
         private async Task LoadProductsAsync(string? keyword = null, string? category = null, string? size = null)
         {
+            if (!DatabaseConnection.IsConfigured(_config.SupabaseConnectionString))
+            {
+                dgProducts.ItemsSource = null;
+                txtMetricTotalItems.Text = "0";
+                txtMetricTotalQty.Text = "0 cái";
+                txtMetricTotalValue.Text = "0 VNĐ";
+                txtMetricOutOfStock.Text = "0 mã";
+                UpdateDbStatus();
+                txtCrudStatus.Text = "Chưa cấu hình kết nối Supabase. Vui lòng vào tab Cấu Hình CSDL Supabase để kết nối.";
+                return;
+            }
+
             try
             {
-                txtCrudStatus.Text = "Đang tải dữ liệu sản phẩm...";
+                txtCrudStatus.Text = "Đang tải dữ liệu sản phẩm từ Supabase...";
                 List<ClothingProduct> products;
 
                 if (!string.IsNullOrWhiteSpace(keyword) || !string.IsNullOrWhiteSpace(category) || !string.IsNullOrWhiteSpace(size))
@@ -64,11 +80,14 @@ namespace ClothingShop.ProductManager
                 txtMetricTotalValue.Text = $"{totalValue:N0} VNĐ";
                 txtMetricOutOfStock.Text = $"{outOfStock:N0} mã";
 
+                UpdateDbStatus(connectionSucceeded: true);
                 txtCrudStatus.Text = $"Đã tải {products.Count} sản phẩm lúc {DateTime.Now:HH:mm:ss}.";
             }
             catch (Exception ex)
             {
-                txtCrudStatus.Text = $"Lỗi tải dữ liệu: {ex.Message}";
+                UpdateDbStatus(connectionSucceeded: false);
+                txtCrudStatus.Text = $"Lỗi tải dữ liệu Supabase: {ex.Message}";
+                MessageBox.Show($"Không thể kết nối/tải dữ liệu từ Supabase:\n{ex.Message}", "Lỗi CSDL Supabase", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -217,16 +236,43 @@ namespace ClothingShop.ProductManager
             _config.SupabaseConnectionString = connStr;
 
             var saved = ConfigDAO.SaveConfig(_config);
-            if (saved)
+            if (!saved)
             {
-                _productService = new ProductService(_config.SupabaseConnectionString);
-                UpdateDbStatus();
-                MessageBox.Show("Đã lưu cấu hình Supabase thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-                await LoadProductsAsync();
+                MessageBox.Show("Lỗi khi lưu file cấu hình.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
-            else
+
+            _productService = new ProductService(_config.SupabaseConnectionString);
+
+            if (!DatabaseConnection.IsConfigured(connStr))
             {
-                MessageBox.Show("Lỗi khi lưu cấu hình.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                UpdateDbStatus();
+                MessageBox.Show("Chuỗi kết nối chưa hợp lệ (đang rỗng hoặc còn placeholder [YOUR-PASSWORD] / [YOUR-PROJECT-REF]). Vui lòng dán Connection String thật từ Supabase.", "Thiếu thông tin kết nối", MessageBoxButton.OK, MessageBoxImage.Warning);
+                await LoadProductsAsync();
+                return;
+            }
+
+            btnSaveDb.IsEnabled = false;
+            btnSaveDb.Content = "Đang kết nối...";
+            try
+            {
+                var (ok, msg) = await DatabaseConnection.TestConnectionAsync(connStr);
+                if (ok)
+                {
+                    UpdateDbStatus(connectionSucceeded: true);
+                    MessageBox.Show($"Đã lưu cấu hình và kết nối Supabase thành công!\n\n{msg}", "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await LoadProductsAsync();
+                }
+                else
+                {
+                    UpdateDbStatus(connectionSucceeded: false);
+                    MessageBox.Show($"Đã lưu chuỗi kết nối vào appsettings.json, nhưng KẾT NỐI SUPABASE THẤT BẠI:\n{msg}", "Lỗi kết nối Supabase", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            finally
+            {
+                btnSaveDb.IsEnabled = true;
+                btnSaveDb.Content = "💾 Lưu Cấu Hình";
             }
         }
     }

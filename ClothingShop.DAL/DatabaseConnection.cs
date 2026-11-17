@@ -8,6 +8,14 @@ namespace ClothingShop.DAL
 {
     public static class DatabaseConnection
     {
+        public static bool IsConfigured(string? connectionString)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString)) return false;
+
+            return !connectionString.Contains("[YOUR-PASSWORD]", StringComparison.OrdinalIgnoreCase)
+                && !connectionString.Contains("[YOUR-PROJECT-REF]", StringComparison.OrdinalIgnoreCase);
+        }
+
         public static string NormalizeConnectionString(string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
@@ -21,7 +29,7 @@ namespace ClothingShop.DAL
                 try
                 {
                     var uri = new Uri(trimmed);
-                    var userInfo = uri.UserInfo.Split(':');
+                    var userInfo = uri.UserInfo.Split(':', 2);
                     var user = userInfo.Length > 0 ? Uri.UnescapeDataString(userInfo[0]) : "postgres";
                     var pass = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty;
                     var host = uri.Host;
@@ -33,7 +41,29 @@ namespace ClothingShop.DAL
                 }
                 catch
                 {
-                    // Nếu lỗi parse URI, giữ nguyên để NpgsqlConnectionStringBuilder thử parse
+                    // Fallback khi mật khẩu chứa ký tự đặc biệt chưa URL-encode (như @, #, ?)
+                    var schemeIdx = trimmed.IndexOf("://", StringComparison.Ordinal);
+                    var afterScheme = schemeIdx >= 0 ? trimmed.Substring(schemeIdx + 3) : trimmed;
+                    var atIdx = afterScheme.LastIndexOf('@');
+                    if (atIdx > 0)
+                    {
+                        var creds = afterScheme.Substring(0, atIdx);
+                        var hostPart = afterScheme.Substring(atIdx + 1);
+                        var colonCredIdx = creds.IndexOf(':');
+                        var user = colonCredIdx >= 0 ? Uri.UnescapeDataString(creds.Substring(0, colonCredIdx)) : Uri.UnescapeDataString(creds);
+                        var pass = colonCredIdx >= 0 ? Uri.UnescapeDataString(creds.Substring(colonCredIdx + 1)) : string.Empty;
+
+                        var slashIdx = hostPart.IndexOf('/');
+                        var hostPort = slashIdx >= 0 ? hostPart.Substring(0, slashIdx) : hostPart;
+                        var db = slashIdx >= 0 ? hostPart.Substring(slashIdx + 1).Split('?')[0] : "postgres";
+                        if (string.IsNullOrWhiteSpace(db)) db = "postgres";
+
+                        var colonHostIdx = hostPort.LastIndexOf(':');
+                        var host = colonHostIdx >= 0 ? hostPort.Substring(0, colonHostIdx) : hostPort;
+                        var port = colonHostIdx >= 0 && int.TryParse(hostPort.Substring(colonHostIdx + 1), out var p) ? p : 5432;
+
+                        return $"Host={host};Port={port};Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true;";
+                    }
                 }
             }
 
@@ -88,9 +118,9 @@ namespace ClothingShop.DAL
 
         public static async Task<(bool success, string message)> TestConnectionAsync(string connectionString, CancellationToken ct = default)
         {
-            if (string.IsNullOrWhiteSpace(connectionString))
+            if (!IsConfigured(connectionString))
             {
-                return (false, "Chuỗi kết nối (Connection String) rỗng.");
+                return (false, "Chuỗi kết nối chưa được cấu hình (đang rỗng hoặc còn placeholder [YOUR-PASSWORD] / [YOUR-PROJECT-REF]).");
             }
 
             try
